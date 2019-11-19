@@ -39,6 +39,22 @@ void draw_line(void *mlx_ptr, void *win_prt, t_point p1, t_point p2) {
 
 }
 
+t_polygon	init_rectangle(t_point p1, t_point p2) {
+	t_polygon point_arr;
+
+
+	point_arr.p = (t_point *)malloc(sizeof(t_point) * 4);
+	point_arr.size = 4;
+	point_arr.p[0] = p1;
+	point_arr.p[1].x = p2.x;
+	point_arr.p[1].y = p1.y;
+	point_arr.p[2] = p2;
+	point_arr.p[3].x = p1.x;
+	point_arr.p[3].y = p2.y;
+
+	return (point_arr);
+}
+
 void	draw_rectangle(void *mlx_ptr, void *win_prt, t_point p1, t_point p2)
 {
 	t_point tp1;
@@ -52,6 +68,45 @@ void	draw_rectangle(void *mlx_ptr, void *win_prt, t_point p1, t_point p2)
 	draw_line(mlx_ptr, win_prt, p1, tp2);
 	draw_line(mlx_ptr, win_prt, tp1, p2);
 	draw_line(mlx_ptr, win_prt, tp2, p2);
+}
+
+void	draw_polygon2d(void *mlx_ptr, void *win_prt, t_point* arr, int len)
+{
+	int i = -1;
+	while (++i < len - 1) 
+	{
+		draw_line(mlx_ptr, win_prt, arr[i], arr[i + 1]);
+	}
+	draw_line(mlx_ptr, win_prt, arr[0], arr[len - 1]);
+}
+
+void	draw_polygon3d(void *mlx_ptr, void *win_ptr, t_point *p, int len)
+{
+	draw_polygon2d(mlx_ptr, win_ptr, p, 4);
+	draw_polygon2d(mlx_ptr, win_ptr, p, 4);
+
+	draw_line(mlx_ptr, win_ptr, p[0], p[4]);
+	draw_line(mlx_ptr, win_ptr, p[1], p[5]);
+	draw_line(mlx_ptr, win_ptr, p[2], p[6]);
+	draw_line(mlx_ptr, win_ptr, p[3], p[7]);
+
+}
+
+void iso(t_point *p, int z, int len)
+{
+    int previous_x;
+    int previous_y;
+	int i;
+
+	i = -1;
+	while (++i < len)
+	{
+		previous_x = p[i].x;
+		previous_y = p[i].y;
+		p[i].x = (previous_x - previous_y) * cos(0.523599);
+		p[i].y = -z + (previous_x + previous_y) * sin(0.523599);
+	}
+
 }
 
 void	draw_circle(void *mlx_ptr, void *win_prt, t_point center, int r)
