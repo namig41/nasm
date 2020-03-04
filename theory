@@ -1,0 +1,129 @@
+Компилцяция .asm файла происходит по команде:  nasm -f elf64
+
+Метка - это вводимое программистом слово, с которым ассемблер ассоциирует некоторое число, чаще всего - адрес в памяти
+
+
+Регистры
+1. Общего назначения
+2. Специальные регистр
+3. Сегментные регистры 
+
+
+1. EAX, EBX, ECX, EDX, ESI, EDI, EBP, ESP - 32 bit (extended)
+    AX, BX, CX, DX, SI, DI, BP, SP - 16 bit
+
+    EAX - 32 bit
+    
+    AX  - 16 bit
+
+    AH - 8 bit and AL - 8 bit
+
+
+    EAX (acummulator) - хранит результат арифметической операци или является операндом
+    ECX (counter) - счетчик
+    EDX (data) - данные (дополняет EAX при арифметических операциях) 
+    ESI and EDI (source index and destination index)
+    SP (stack pointer)
+
+
+2. EIP - счетчик команд (регистр в котором хранится адрес следующей команды в памяти)
+   FLAGS - регистр флагов 
+        ZF (zero flag)  - флаг нулевого результата при арифм. операции
+        CF (carry flag) - флаг переноса (результат арифм. операции не поместился в регистр)
+        SF (sign flag)  - флаг знака
+        OF (overflow)   - флаг переполнения
+        
+Резервирования неинициализированных данных 
+resb - 1 byte
+resw - 2 byte
+resd - 4 byte
+
+Пример
+string resb 20  массив 1 байтовых ячеек
+count  resw 256 массив 2 байтовых ячеек
+x      resd 1   одно 4 байтовое целое число 
+
+Резервирования инициализированных данных 
+db - 1 byte
+dw - 2 byte
+dd - 4 byte
+
+16 разрядные числа 
+digit + h
+$ + digit
+0x + digit
+
+Косвенная адресация - это значение в качестве адреса и поэтому адресу обратиться в память
+Example
+    mov ebx, [eax]
+Прямая адресация - адрес задается явно
+Example
+    mov ebx, eax
+
+Определение размера операнда
+byte
+word
+dword
+
+Команды:
+jnz (jump if no zero) - если не ноль, то повторяем цикл
+jl (jump if lower)    - если первый операнд меньше второго, то true
+jmp address - прыжок по адресу (near (любое место), short (128 byte))
+
+Арифметические операции
+Example:
+    add eax, ebx Взять значение из регистра eax и добавить к нему значение ebx 
+    sub dword [x], ecx Взять 4 байтное число и отнять от него значение регистра ecx
+
+Сравнение 2-ух чисел a, b
+1. a - b, если SF = 1, но OZ = 0 или SF = 0, но OZ = 1
+2. SF != OF jl or jnge
+
+je          a = b 
+jne         a != b 
+
+Знаковых
+jl          a < b 
+jle         a <= b 
+jg          a > b
+jge         a >= b
+
+Беззнаковых 
+jb          a < b
+jbe         a <= b
+ja          a > b
+jae         a >= b
+
+xor, and, or работают бысрее 
+xor eax, eax обнуление
+
+test = and только не записывает результат
+
+shl, shr побитовые сдвиги
+
+Операции сдвига
+shr, shl
+
+Stack
+Cтек растет вверх - в сторону уменьшения адресов
+
+Подпрограммы
+
+; fill memory (edi=address, ecx=length, al=value)
+fill_memory:
+    jecxz fm_q
+    fm_lp: mov [edi], al
+    inc edi
+    loop fm_lp
+fm_q: ret
+
+Команда cmp
+jz  ZF = 1          jnz  ZF = 0
+js  SF = 1          jns  SF = 0
+jc  CF = 1          jnc  CF = 0
+jo  JF = 1          jno  JF = 0
+jp  PF = 1          jnp  PF = 0
+
+Команда loop 
+1. прыгает к нужному адресу 
+2. уменьшает регистр (ecx - count)
