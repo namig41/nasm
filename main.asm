@@ -89,9 +89,10 @@ getstr:
                  int 0x80
                  ret 
 
-strrev:         xor eax, eax
-                mov ebx, [string]
+strrev:         
+				xor eax, eax
                 xor ecx, ecx
+                mov ebx, [string]
 strrev_null:    mov al, [ebx + ecx]
                 cmp al, byte 0
                 jz strrev_rev
@@ -116,7 +117,31 @@ strcmp_done:	add dword [res], eax
 				add dword [res], eax
 				ret
 
-; strcpy:
+char_tolower:  	
+				xor eax, eax
+				mov al, [char]
+				cmp al, byte 'Z'
+				ja tolower_done
+				cmp al, byte 'A'	
+				jb tolower_done
+				add al, byte 32
+				mov [char], al	
+tolower_done:	ret
+
+strlower: 		
+				xor ecx, ecx
+				xor eax, eax
+				mov ebx, [string]
+strlower_null:	mov al, [ebx + ecx]
+				cmp al, byte 0xa
+				jz strlower_done
+				mov [char], al
+				call char_tolower
+				mov al, [char]
+				mov [ebx + ecx], al
+				inc ecx
+				jmp strlower_null
+strlower_done:	ret
 
 _start:       
        ; call getstr
@@ -141,26 +166,42 @@ _start:
        ; mov [char], byte 0xa
        ; call putchar
 
-	 	mov eax, input_msg
-		mov [string], eax
-		call putstr
-		call getstr
-		mov eax, buffer
-		mov [str1], eax
+		;mov eax, input_msg
+		;mov [string], eax
+		;call putstr
+		;call getstr
+		;mov eax, buffer
+		;mov [str1], eax
 
+		;mov eax, input_msg
+		;mov [string], eax
+		;call putstr
+		;call getstr
+		;mov eax, buffer
+		;mov [str2], eax 
+
+		;mov eax, [str1]
+		;mov [string], eax
+		;call putstr
+		;mov eax, [str2]
+		;mov [string], eax
+		;call putstr
+			
+		;mov al, byte 'A'
+		;mov [char], al
+		;call char_tolower
+		;call putchar
+	
 		mov eax, input_msg
 		mov [string], eax
 		call putstr
 		call getstr
 		mov eax, buffer
-		mov [str2], eax 
+		mov [string], eax
+		call strlower
+		call putstr 
+		
 
-		mov eax, [str1]
-		mov [string], eax
-		call putstr
-		mov eax, [str2]
-		mov [string], eax
-		call putstr
 
         mov eax, 1      
         mov ebx, 0     
