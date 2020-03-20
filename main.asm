@@ -117,6 +117,32 @@ strcmp_done:	add dword [res], eax
 				add dword [res], eax
 				ret
 
+char_toupper:  	
+				xor eax, eax
+				mov al, [char]
+				cmp al, byte 'z'
+				ja toupper_done
+				cmp al, byte 'a'	
+				jb toupper_done
+				sub al, byte 32
+				mov [char], al	
+toupper_done:	ret
+
+strupper: 		
+				xor ecx, ecx
+				xor eax, eax
+				mov ebx, [string]
+strupper_null:	mov al, [ebx + ecx]
+				cmp al, byte 0xa
+				jz strupper_done
+				mov [char], al
+				call char_toupper
+				mov al, [char]
+				mov [ebx + ecx], al
+				inc ecx
+				jmp strupper_null
+strupper_done:	ret
+
 char_tolower:  	
 				xor eax, eax
 				mov al, [char]
@@ -187,9 +213,9 @@ _start:
 		;mov [string], eax
 		;call putstr
 			
-		;mov al, byte 'A'
+		;mov al, byte 'a'
 		;mov [char], al
-		;call char_tolower
+		;call char_toupper
 		;call putchar
 	
 		mov eax, input_msg
@@ -198,7 +224,7 @@ _start:
 		call getstr
 		mov eax, buffer
 		mov [string], eax
-		call strlower
+		call strupper
 		call putstr 
 		
 
