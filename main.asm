@@ -5,9 +5,11 @@ len1     equ $ - msg1
 msg2     db "Namig Guseinov", 0xa, 0x0
 len2     equ $ - msg2
 
-error_msg db "I am here", 0xa, 0x0
+error_msg db "Error", 0xa, 0x0
 
 input_msg db "Input: ", 0x0
+
+test_msg db "abc dfe", 0x0
 
 SECTION .bss
 char     resb 1
@@ -16,9 +18,9 @@ string   resd 1
 count    resd 1
 buffer   resb 100
 
-str1 	resd 1
-str2 	resd 1
-res 	resd 1
+str1 	 resd 1
+str2 	 resd 1
+res 	 resd 1
 
 SECTION  .text
 global _start           
@@ -48,7 +50,7 @@ strchr_done:    mov [chr], eax
 strlen:
                 xor eax, eax 
                 mov esi, [string]
-strlen_null:    cmp [esi], byte 0
+strlen_null:    cmp [esi], byte 0x0
                 jz strlen_done 
                 inc eax
                 inc esi
@@ -65,13 +67,19 @@ putchar:
                 ret
 
 putstr:         
-                 call strlen
-                 mov eax, 4
-                 mov ebx, 1
-                 mov ecx, [string]
-                 mov edx, [count]
-                 int 0x80
-                 ret
+                call strlen
+                mov eax, 4
+                mov ebx, 1
+                mov ecx, [string]
+                mov edx, [count]
+                int 0x80
+                ret
+putendl:
+				call putstr
+				mov al, 0xa
+				mov [char], al
+				call putchar
+				ret
 
 getchar:
                  mov eax, 3
@@ -94,12 +102,12 @@ strrev:
                 xor ecx, ecx
                 mov ebx, [string]
 strrev_null:    mov al, [ebx + ecx]
-                cmp al, byte 0
+                cmp al, byte 0x0
                 jz strrev_rev
                 push ax
                 inc ecx
                 jmp short strrev_null
-strrev_rev:     cmp ecx, dword 0 
+strrev_rev:     cmp ecx, dword 0x0 
                 jz strrev_done 
                 pop ax
                 mov [ebx], al
@@ -170,65 +178,22 @@ strlower_null:	mov al, [ebx + ecx]
 strlower_done:	ret
 
 _start:       
-       ; call getstr
-       ; mov eax, buffer
-       ; mov [string], eax 
-       ; call putstr
 
-       ; mov eax, msg1
-       ; mov [string], dword eax
-       ; mov [char], byte '1'
-       ; call putstr
-       ; call strchr
-       ; mov eax, [chr]
-       ; mov [string], eax
-       ; call putstr 
+				mov eax, test_msg
+				mov [string], eax
+				call putstr
 
-       ; mov eax, msg1
-       ; mov [string], eax
-       ; call putstr
-       ; call strrev
-       ; call putstr
-       ; mov [char], byte 0xa
-       ; call putchar
-
-		;mov eax, input_msg
-		;mov [string], eax
-		;call putstr
-		;call getstr
-		;mov eax, buffer
-		;mov [str1], eax
-
-		;mov eax, input_msg
-		;mov [string], eax
-		;call putstr
-		;call getstr
-		;mov eax, buffer
-		;mov [str2], eax 
-
-		;mov eax, [str1]
-		;mov [string], eax
-		;call putstr
-		;mov eax, [str2]
-		;mov [string], eax
-		;call putstr
-			
-		;mov al, byte 'a'
-		;mov [char], al
-		;call char_toupper
-		;call putchar
-	
-		mov eax, input_msg
-		mov [string], eax
-		call putstr
-		call getstr
-		mov eax, buffer
-		mov [string], eax
-		call strupper
-		call putstr 
+				;mov eax, input_msg
+				;mov [string], eax
+				;call putstr
+				;call getstr
+				;mov eax, buffer
+				;mov [string], eax
+				;call strupper
+				;call putstr 
 		
 
 
-        mov eax, 1      
-        mov ebx, 0     
-        int 0x80      
+        		mov eax, 1      
+        		mov ebx, 0     
+        		int 0x80      
