@@ -9,14 +9,16 @@ error_msg db "Error", 0xa, 0x0
 
 input_msg db "Input: ", 0x0
 
-test_msg db "abc dfe", 0x0
+file_name db "test", 0x0
 
 SECTION .bss
 char     resb 1
 chr      resd 1
 string   resd 1
 count    resd 1
-buffer   resb 100
+buffer   resb 128
+buffer2	 resb 128
+
 
 str1 	 resd 1
 str2 	 resd 1
@@ -93,7 +95,7 @@ getstr:
                  mov eax, 3
                  mov ebx, 0
                  mov ecx, buffer
-                 mov edx, 100 
+                 mov edx, 128
                  int 0x80
                  ret 
 
@@ -177,11 +179,58 @@ strlower_null:	mov al, [ebx + ecx]
 				jmp strlower_null
 strlower_done:	ret
 
+putstr_fd:			
+				mov eax, input_msg
+				mov [string], eax
+
+				call putstr
+				call getstr
+
+				mov eax, buffer
+				mov [string], eax
+
+				call strlen
+				mov eax, [count]
+				mov byte [buffer + eax - 1], 0x0 
+
+				; OPEN
+				mov eax, 5
+				mov ebx, buffer
+				mov ecx, 2
+				int 0x80
+
+				mov [res], eax
+
+				mov eax, input_msg
+				mov [string], eax
+
+				call putstr
+				call getstr
+
+				mov eax, buffer
+				mov [string], eax
+				call strlen
+
+				; WRITE
+				mov eax, 4
+				mov ebx, [res]
+				mov ecx, buffer
+				mov edx, [count]
+				int 0x80
+
+				; CLOSE
+				mov eax, 6
+				mov ebx, [res]
+				int 0x80
+				ret
+
+				
+
 _start:       
 
-				mov eax, test_msg
-				mov [string], eax
-				call putstr
+				;mov eax, test_msg
+				;mov [string], eax
+				;call putstr
 
 				;mov eax, input_msg
 				;mov [string], eax
@@ -191,8 +240,8 @@ _start:
 				;mov [string], eax
 				;call strupper
 				;call putstr 
-		
 
+				call putstr_fd
 
         		mov eax, 1      
         		mov ebx, 0     
