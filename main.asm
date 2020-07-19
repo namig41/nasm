@@ -97,6 +97,7 @@ getstr:
                  mov ecx, buffer
                  mov edx, 128
                  int 0x80
+				 mov byte [buffer + eax - 1], 0x0 
                  ret 
 
 strrev:         
@@ -224,7 +225,62 @@ putstr_fd:
 				int 0x80
 				ret
 
+readstr_fd:
+				mov eax, input_msg
+				mov [string], eax
+
+				call putstr
+				call getstr
+
+				call strlen
+				mov eax, [count]
+				mov byte [buffer + eax - 1], 0x0 
+
+				; OPEN
+				mov eax, 5
+				mov ebx, buffer
+				mov ecx, 2
+
+				mov [res], eax
 				
+				; READ
+				mov eax, 3
+				mov ebx, buffer
+				mov ecx, 128
+
+				; CLOSE
+				mov eax, 6
+				mov ebx, [res]
+				int 0x80
+
+				mov eax, buffer
+				mov [string], eax
+				call putstr
+				ret
+
+strreverse:		
+				xor eax, eax
+				xor ecx, ecx
+				mov ebx, [string]
+str_null:		mov byte al, [ebx + ecx]
+				cmp al, byte 0x0
+				jz str_next
+				push ax
+				inc ecx
+				jmp short str_null
+str_next:		
+
+				xor edx, edx
+str_null_2:		pop ax
+				mov [edx + ebx], byte al
+				cmp ecx, 0
+				jz str_done
+				inc ebx
+				loop str_null_2
+str_done:		ret
+
+
+
 
 _start:       
 
@@ -241,7 +297,17 @@ _start:
 				;call strupper
 				;call putstr 
 
-				call putstr_fd
+				mov eax, input_msg
+				mov [string], eax
+				call putstr
+				call getstr
+
+				mov eax, buffer
+				mov [string], eax
+				call strreverse
+
+				call putstr
+
 
         		mov eax, 1      
         		mov ebx, 0     
