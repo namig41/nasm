@@ -7,8 +7,8 @@ OBJS 	= $(addsuffix .o, $(SRC_NAME))
 
 NAME 	= learn_nasm
 CC 		= nasm
-LINK 	= ld
 FLAGS 	= -f elf
+LINK 	= ld
 
 
 all: $(NAME)
